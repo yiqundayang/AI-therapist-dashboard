@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户列表 - AI咨询师驾驶舱</title>
+  
+  <!-- 引入公共样式 -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/customer-list.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 页面头部 -->
+    <header class="page-header">
+      <a href="javascript:history.back()" class="back-btn">← 返回</a>
+      <h1 class="page-title">客户列表</h1>
+      <div class="header-actions">
+        
+      </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+      <!-- 搜索和筛选区域 -->
+      <div class="search-filter-section">
+        <div class="search-filter-container">
+          <div class="search-box">
+            <input type="text" id="customerSearch" class="search-input" placeholder="搜索客户姓名、手机号或昵称...">
+            <span class="search-icon">🔍</span>
+          </div>
+          
+          <div class="filter-controls">
+            <select id="statusFilter" class="filter-select">
+              <option value="all">全部状态</option>
+              <option value="pending-first">待首访</option>
+              <option value="first-visit">首访</option>
+              <option value="first-consultation">首次咨询</option>
+              <option value="ongoing">服务中</option>
+              <option value="completed">已完成</option>
+              <option value="follow-up">待回访</option>
+              <option value="paused">暂停</option>
+              <option value="transferred">已转出</option>
+            </select>
+            
+            <select id="sortBy" class="filter-select">
+              <option value="recent">最近活动</option>
+              <option value="name">姓名排序</option>
+              <option value="sessions">咨询次数</option>
+              <option value="created">创建时间</option>
+            </select>
+            
+            <button class="btn btn-secondary filter-btn">筛选</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 客户列表 -->
+      <div class="customer-list-section">
+        <div class="list-header">
+          <h2>客户列表</h2>
+        </div>
+
+        <!-- 表格视图 -->
+        <div class="customer-table-container" id="customerTable">
+          <table class="customer-table">
+            <thead>
+              <tr>
+                <th>客户信息</th>
+                <th>状态</th>
+                <th>已咨询次数</th>
+                <th>最近咨询</th>
+                <th>剩余小时数</th>
+                <th>紧急联系人电话</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="customerTableBody">
+              <!-- 表格行将动态生成 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            <span id="pageInfo">显示第 1-10 条，共 10 条记录</span>
+          </div>
+          <div class="pagination-controls">
+            <button class="btn btn-outline pagination-btn" id="prevBtn" disabled>
+              ← 上一页
+            </button>
+            <div class="page-numbers" id="pageNumbers">
+              <!-- 页码将动态生成 -->
+            </div>
+            <button class="btn btn-outline pagination-btn" id="nextBtn" disabled>
+              下一页 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 引入公共脚本 -->
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/customer-list.js"></script>
+</body>
+</html> 

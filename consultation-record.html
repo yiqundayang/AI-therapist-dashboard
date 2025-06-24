@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>咨询记录 - AI咨询师驾驶舱</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/consultation-record.css">
+</head>
+<body>
+  <div class="consultation-page-wrapper">
+    <!-- 1. 顶部返回栏 -->
+    <div class="top-bar">
+      <button class="back-button" onclick="history.back()">
+        <span class="arrow">‹</span>
+        <span>返回</span>
+      </button>
+    </div>
+
+    <!-- 2. 页面主体 (双栏布局) -->
+    <div class="page-body">
+      
+      <!-- 2.1. 左侧边栏 -->
+      <aside class="sidebar expanded">
+        <div class="sidebar-header">
+          <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+            <span class="collapse-icon">◀</span>
+          </button>
+        </div>
+        <div class="sidebar-content">
+          <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-sidebar-tab="records">
+              <span class="tab-icon">📋</span>
+              <span class="tab-text">咨询记录</span>
+            </button>
+            <button class="sidebar-tab" data-sidebar-tab="user-info">
+              <span class="tab-icon">👤</span>
+              <span class="tab-text">用户信息</span>
+            </button>
+          </div>
+          <div class="sidebar-panels">
+            <div class="sidebar-panel active" data-sidebar-panel="records" id="recordsPanel">
+              <!-- 咨询记录卡片将由JS动态生成 -->
+            </div>
+            <div class="sidebar-panel" data-sidebar-panel="user-info" id="userInfoPanel">
+              <!-- 用户信息将由JS动态生成 -->
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 2.2. 右侧主内容区 -->
+      <main class="main-content-area">
+        <header class="main-content-header">
+            <h1 class="main-title" id="consultationTitle">学业压力与教养冲突</h1>
+            <p class="consultation-meta">
+                <span id="consultationDateTime">2025-05-25 15:40-16:00</span>
+                <span>|</span>
+                <span>第 <strong>17</strong> 次</span>
+                <span>|</span>
+                <span>视频咨询</span>
+            </p>
+        </header>
+
+        <div class="page-tabs">
+          <button class="page-tab" data-tab="notes">咨询笔记</button>
+          <button class="page-tab active" data-tab="transcript">逐字稿</button>
+          <button class="page-tab" data-tab="ai-record">智能记录</button>
+        </div>
+
+        <div class="page-panels">
+          <div class="page-panel" data-panel="notes">
+            <div class="notes-editor-container">
+              <div class="editor-toolbar">
+                <div class="tool-group">
+                  <button class="tool-btn active" data-mode="text">Aa 文本</button>
+                  <button class="tool-btn" data-mode="handwriting">✍️ 手写</button>
+                  <button class="tool-btn" data-mode="voice">🎤 语音</button>
+                </div>
+                <div class="tool-group" id="handwriting-tools" style="display: none;">
+                  <button class="tool-option" id="color-black"></button>
+                  <button class="tool-option" id="color-red"></button>
+                  <button class="tool-option" id="color-blue"></button>
+                  <button class="tool-option" id="undo-btn">撤销</button>
+                  <button class="tool-option" id="clear-btn">清空</button>
+                </div>
+                 <div class="tool-group" id="voice-tools" style="display: none;">
+                  <span id="voice-status">点击"语音"按钮开始识别...</span>
+                </div>
+              </div>
+              <div class="editor-content">
+                <textarea id="text-input" class="text-area" placeholder="在此输入文本笔记..."></textarea>
+                <canvas id="handwriting-canvas" class="handwriting-area" style="display: none;"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="page-panel active" data-panel="transcript">
+            <div class="transcript-view-wrapper">
+                <!-- 4. 时间轴 -->
+                <div class="timeline-container" id="timelineContainer">
+                    <!-- 时间轴将由JS动态生成 -->
+                </div>
+                <!-- 逐字稿主体 -->
+                <div class="transcript-wrapper">
+                    <!-- 3. 标签筛选 -->
+                    <div class="filter-tags-container" id="filterTagsContainer">
+                        <!-- 筛选标签将由JS动态生成 -->
+                    </div>
+                    <div class="search-bar">
+                      <span class="search-icon">🔍</span>
+                      <input type="text" placeholder="搜索文字记录">
+                      <div class="transcript-actions">
+                        <div class="download-dropdown">
+                          <button class="action-btn download-btn" id="transcriptDownloadBtn">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载逐字稿</span>
+                            <span class="dropdown-icon">▼</span>
+                          </button>
+                          <div class="dropdown-menu" id="transcriptDownloadMenu">
+                            <button class="dropdown-item" onclick="consultationRecord.downloadTranscript('original')">
+                              <span class="item-icon">📄</span>
+                              <span class="item-text">原文逐字稿</span>
+                            </button>
+                            <button class="dropdown-item" onclick="consultationRecord.downloadTranscript('with-tags')">
+                              <span class="item-icon">🏷️</span>
+                              <span class="item-text">含标签/提示的逐字稿</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="transcript-container" id="transcriptContainer">
+                      <!-- 逐字稿内容将由JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="page-panel" data-panel="ai-record">
+            <div class="record-layout">
+              <section class="record-main full-width">
+                <div class="record-tabs">
+                  <button class="tab-btn active" data-tab="parent-helper">家长沟通助手</button>
+                  <button class="tab-btn" data-tab="dialogue">对话总结</button>
+                  <button class="tab-btn" data-tab="topics">话题总结</button>
+                  <button class="tab-btn" data-tab="characters">对话中的人与物</button>
+                  <button class="tab-btn" data-tab="process">咨询过程总结</button>
+                  <button class="tab-btn" data-tab="suggestions">后续咨询建议</button>
+                </div>
+                <div class="tab-content">
+                  <!-- 家长沟通助手 -->
+                  <div class="tab-panel active" data-panel="parent-helper">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">👨‍👩‍👧‍👦 家长沟通助手</h3>
+                        <div class="section-actions">
+                          <button class="action-btn copy-btn" onclick="consultationRecord.copyContent('parent-helper')">
+                            <span class="btn-icon">📋</span>
+                            <span class="btn-text">复制全文</span>
+                          </button>
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('parent-helper')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="parent-helper-content" id="parentHelperContent">
+                        <div class="helper-intro">
+                          <p>AI已根据本次咨询的内容为您整理了与家长沟通的建议，您可以按需修改后与家长复制使用</p>
+                        </div>
+                        
+                        <div class="helper-letter">
+                          <div class="letter-greeting">
+                            <p>【孩子名字】家长好呀～今天想和您简单聊聊这次咨询的整体状况，咱们一起更好地支持他成长～😊</p>
+                          </div>
+                          
+                          <div class="letter-section editable-content" data-field="child-situation">
+                            <p><strong>😊 孩子的情况和表现：</strong></p>
+                            <p>这次咨询中，【孩子名字】展现出愿意表达的积极意愿😊，虽然话题有些发散，但能感受到他在尝试通过不同内容传达自己的情绪和想法。整体状况比较放松，不过在某些焦点内心需求上还需要更多引导，这也是我们下一步可以一起关注的方向～</p>
+                          </div>
+                          
+                          <div class="letter-section editable-content" data-field="key-suggestions">
+                            <p><strong>📋 家长建议：</strong></p>
+                            <p>1. 日常交流时，不妨多给【孩子名字】一些表达空间，耐心倾听他的分享，不急于纠正或追问细节； 2. 可以用"你别说的这些听起来你像…"这样的句式回应，帮他慢慢理解感受； 3. 保持家庭氛围轻松，让他知道任何情况和想法都能被接纳，这对他打开心门很有帮助～</p>
+                          </div>
+                          
+                          <div class="letter-section editable-content" data-field="next-steps">
+                            <p><strong>📝 下一步计划：</strong></p>
+                            <p>下次咨询会重点和【孩子名字】探索"如何更清晰地表达内心感受"，您可以在这期间观察他有"什么时候最愿意说话"，"说什么内容会让自己更舒服"，简单记下来，我们一起讨论～这能帮他更主动地理解自己～</p>
+                          </div>
+                          
+                          <div class="letter-closing">
+                            <p>感谢您一直以来对孩子的关心和对咨询师工作的支持。我们一起为孩子创造一个更好的成长环境，我相信孩子一定能够在我们的共同努力下健康快乐地成长。如果在实施过程中有任何疑问，请随时与我联系【联系人】期待您的反馈～❤️</p>
+                            <div class="letter-stats">
+                              <span class="char-count">482/5000</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 对话总结 -->
+                  <div class="tab-panel" data-panel="dialogue">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">对话总结</h3>
+                        <div class="section-actions">
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('dialogue')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                          <button class="action-btn save-btn" onclick="consultationRecord.saveContent('dialogue')" style="display: none;">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">保存</span>
+                          </button>
+                          <button class="action-btn download-btn" onclick="consultationRecord.downloadContent('dialogue')">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="standard-content">
+                        <div class="content-item">
+                          <h4>核心议题</h4>
+                          <div class="editable-content">
+                            <p>本次咨询中对话内容较为混乱，来访者咨询师之间在沟通现状或信息不对称，导致交流不畅。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>主要困扰与需求</h4>
+                          <div class="editable-content">
+                            <p>来访者在对话中表现出这类客观、跳跃性强的特征，咨询师需要在引导但没有非常有限。主要问题可能涉及来访者的思维组织、情绪聚焦因难或现实生活中深层需求缺乏有效表达，需要进一步挖掘和理解。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>下次咨询计划建议</h4>
+                          <div class="editable-content">
+                            <p>1. 明确来访者的咨询目标和当前最关切的问题领域。</p>
+                            <p>2. 建立更清晰的对话结构，帮助来访者聚焦于具体议题。</p>
+                            <p>3. （由咨询师）可使用情绪聚焦疗法深度来访者当下的感受体验，识别在情绪组织。</p>
+                            <p>4. （由咨询师）若为团体咨询情境，需进一步评估访者在团体中的互动模式及与其他成员的关系动态。</p>
+                            <p>5. （由咨询师）关注是否存在注意力难以集中、思维发散等问题，需要时评估是否需要医学层面的协助干预。</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 话题总结 -->
+                  <div class="tab-panel" data-panel="topics">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">话题总结</h3>
+                        <div class="section-actions">
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('topics')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                          <button class="action-btn save-btn" onclick="consultationRecord.saveContent('topics')" style="display: none;">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">保存</span>
+                          </button>
+                          <button class="action-btn download-btn" onclick="consultationRecord.downloadContent('topics')">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="standard-content">
+                        <div class="content-item">
+                          <h4>经济与资源考量</h4>
+                          <div class="editable-content">
+                            <p>多次提到价格、优惠、成本"不到一千五块钱，用反而经金优惠"，"现在有有1000吗？"显示来访者对金钱或或谈过的关注，可能作为某种心理和现实压力点。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>考试与评价焦虑</h4>
+                          <div class="editable-content">
+                            <p>来访者提及平时学习及比较集中表现出一定的关注，例如到"最高分多少分"，"去年比赛做在深海运营"，可能反映出对学业或表现的焦虑。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>身份与决策压力</h4>
+                          <div class="editable-content">
+                            <p>表达中类似于"如果你为什么这样议"，"那就是我的问题"的陈述，流露出自我质疑、决策不确定感或任何承受。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>身体与感知问题</h4>
+                          <div class="editable-content">
+                            <p>多次出现类似"听不进去声音"，"家不进去声音"等表述，可能暗示来访者存在注意力方面的困难或对环境声音的过度敏感。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>产品推广内容混入</h4>
+                          <div class="editable-content">
+                            <p>对话中穿插了大量类似保健品（如鱼油）、优惠活动、产品性能介绍等商业内容，可能反映来访者青春期咨询相关的思维。</p>
+                          </div>
+                        </div>
+                        <div class="content-item">
+                          <h4>人际关系与社会适应</h4>
+                          <div class="editable-content">
+                            <p>提及"七七的兄弟以前说过最聪的朋友不算"，"我们的工作"等内容，可能涉及身边人际关系及工作/学习环境压力，显示出一定的人际或色彩适应议题。</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 对话中的人与物 -->
+                  <div class="tab-panel" data-panel="characters">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">👥 人物角色</h3>
+                        <div class="section-actions">
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('characters')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                          <button class="action-btn save-btn" onclick="consultationRecord.saveContent('characters')" style="display: none;">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">保存</span>
+                          </button>
+                          <button class="action-btn download-btn" onclick="consultationRecord.downloadContent('characters')">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="character-grid">
+                        <div class="character-card">
+                          <div class="character-avatar">👨</div>
+                          <h4>父亲</h4>
+                          <div class="character-traits">
+                            <span class="trait">严格型</span>
+                            <span class="trait">焦虑型</span>
+                          </div>
+                          <p>对孩子学习要求严格，担心放松管理会影响未来发展。表现出对现状的不满和对改变的迫切需求。</p>
+                        </div>
+                        
+                        <div class="character-card">
+                          <div class="character-avatar">👩</div>
+                          <h4>母亲</h4>
+                          <div class="character-traits">
+                            <span class="trait">宽松型</span>
+                            <span class="trait">包容型</span>
+                          </div>
+                          <p>倾向于给孩子更多自由空间，认为适度的娱乐和放松对孩子发展有益。主张耐心等待孩子成长。</p>
+                        </div>
+                        
+                        <div class="character-card">
+                          <div class="character-avatar">🧒</div>
+                          <h4>孩子 (李小雅)</h4>
+                          <div class="character-traits">
+                            <span class="trait">青春期</span>
+                            <span class="trait">求关注</span>
+                          </div>
+                          <p>正处于青春期，学习成绩有所下滑，对电子设备感兴趣。在父母不同教育方式中寻找平衡。</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="content-section">
+                      <h3 class="section-title">📱 关键物品</h3>
+                      <div class="object-list">
+                        <div class="object-item">
+                          <span class="object-icon">📱</span>
+                          <div class="object-info">
+                            <h5>手机</h5>
+                            <p>成为家庭冲突的焦点，父亲认为影响学习，母亲认为适度使用无妨</p>
+                          </div>
+                        </div>
+                        
+                        <div class="object-item">
+                          <span class="object-icon">📺</span>
+                          <div class="object-info">
+                            <h5>电视</h5>
+                            <p>另一个争议焦点，代表了娱乐与学习时间分配的矛盾</p>
+                          </div>
+                        </div>
+                        
+                        <div class="object-item">
+                          <span class="object-icon">📚</span>
+                          <div class="object-info">
+                            <h5>学习资料</h5>
+                            <p>父亲希望孩子更多投入，母亲认为不应过度施压</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 咨询过程总结 -->
+                  <div class="tab-panel" data-panel="process">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">📈 咨询过程分析</h3>
+                        <div class="section-actions">
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('process')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                          <button class="action-btn save-btn" onclick="consultationRecord.saveContent('process')" style="display: none;">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">保存</span>
+                          </button>
+                          <button class="action-btn download-btn" onclick="consultationRecord.downloadContent('process')">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="process-timeline">
+                        <div class="timeline-item">
+                          <div class="timeline-marker">1</div>
+                          <div class="timeline-content">
+                            <h4>开场与问题澄清 (0-10分钟)</h4>
+                            <p>了解家庭基本情况，明确咨询目标。父母表达了对孩子学习状态的不同观点。</p>
+                          </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                          <div class="timeline-marker">2</div>
+                          <div class="timeline-content">
+                            <h4>深度探索 (10-25分钟)</h4>
+                            <p>挖掘教育理念分歧的根源，探讨各自的担忧和期望。发现沟通模式的问题。</p>
+                          </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                          <div class="timeline-marker">3</div>
+                          <div class="timeline-content">
+                            <h4>情感疏导 (25-35分钟)</h4>
+                            <p>帮助父母理解对方的立场，缓解紧张情绪，建立共情基础。</p>
+                          </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                          <div class="timeline-marker">4</div>
+                          <div class="timeline-content">
+                            <h4>方案讨论 (35-45分钟)</h4>
+                            <p>共同探讨可行的解决方案，制定初步的家庭教育计划。</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="content-section">
+                      <h3 class="section-title">🎯 咨询效果评估</h3>
+                      <div class="effect-grid">
+                        <div class="effect-item">
+                          <h4>情绪变化</h4>
+                          <div class="progress-bar">
+                            <div class="progress" style="width: 75%"></div>
+                          </div>
+                          <span>75% 改善</span>
+                        </div>
+                        
+                        <div class="effect-item">
+                          <h4>理解增进</h4>
+                          <div class="progress-bar">
+                            <div class="progress" style="width: 80%"></div>
+                          </div>
+                          <span>80% 改善</span>
+                        </div>
+                        
+                        <div class="effect-item">
+                          <h4>合作意愿</h4>
+                          <div class="progress-bar">
+                            <div class="progress" style="width: 70%"></div>
+                          </div>
+                          <span>70% 改善</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 后续咨询建议 -->
+                  <div class="tab-panel" data-panel="suggestions">
+                    <div class="content-section">
+                      <div class="section-header">
+                        <h3 class="section-title">🔮 后续咨询建议</h3>
+                        <div class="section-actions">
+                          <button class="action-btn edit-btn" onclick="consultationRecord.toggleEdit('suggestions')">
+                            <span class="btn-icon">✏️</span>
+                            <span class="btn-text">编辑</span>
+                          </button>
+                          <button class="action-btn save-btn" onclick="consultationRecord.saveContent('suggestions')" style="display: none;">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">保存</span>
+                          </button>
+                          <button class="action-btn download-btn" onclick="consultationRecord.downloadContent('suggestions')">
+                            <span class="btn-icon">📥</span>
+                            <span class="btn-text">下载</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="suggestion-cards">
+                        <div class="suggestion-card priority-high">
+                          <div class="card-header">
+                            <h4>🚨 优先级：高</h4>
+                            <span class="timeline">下次咨询</span>
+                          </div>
+                          <h5>建立统一的教育理念</h5>
+                          <p>帮助父母找到教育方式的平衡点，制定双方都能接受的家庭规则和管理策略。</p>
+                          <div class="suggestion-methods">
+                            <span class="method">家庭会议</span>
+                            <span class="method">角色扮演</span>
+                            <span class="method">目标设定</span>
+                          </div>
+                        </div>
+                        
+                        <div class="suggestion-card priority-medium">
+                          <div class="card-header">
+                            <h4>⚠️ 优先级：中</h4>
+                            <span class="timeline">2-3次内</span>
+                          </div>
+                          <h5>改善亲子沟通模式</h5>
+                          <p>教授有效的沟通技巧，帮助家庭成员更好地表达需求和情感，减少冲突发生。</p>
+                          <div class="suggestion-methods">
+                            <span class="method">沟通训练</span>
+                            <span class="method">倾听技巧</span>
+                            <span class="method">情感表达</span>
+                          </div>
+                        </div>
+                        
+                        <div class="suggestion-card priority-low">
+                          <div class="card-header">
+                            <h4>💡 优先级：低</h4>
+                            <span class="timeline">长期跟进</span>
+                          </div>
+                          <h5>孩子个体辅导</h5>
+                          <p>根据孩子的具体情况，提供个性化的学习动机激发和情绪管理支持。</p>
+                          <div class="suggestion-methods">
+                            <span class="method">个体咨询</span>
+                            <span class="method">学习指导</span>
+                            <span class="method">兴趣培养</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="content-section">
+                      <h3 class="section-title">📅 咨询计划</h3>
+                      <div class="plan-table">
+                        <div class="plan-row plan-header">
+                          <div class="plan-cell">咨询次数</div>
+                          <div class="plan-cell">主要目标</div>
+                          <div class="plan-cell">预期时间</div>
+                          <div class="plan-cell">成功指标</div>
+                        </div>
+                        
+                        <div class="plan-row">
+                          <div class="plan-cell">第4次</div>
+                          <div class="plan-cell">教育理念统一</div>
+                          <div class="plan-cell">1周后</div>
+                          <div class="plan-cell">制定家庭规则</div>
+                        </div>
+                        
+                        <div class="plan-row">
+                          <div class="plan-cell">第5次</div>
+                          <div class="plan-cell">沟通技巧训练</div>
+                          <div class="plan-cell">2周后</div>
+                          <div class="plan-cell">冲突减少50%</div>
+                        </div>
+                        
+                        <div class="plan-row">
+                          <div class="plan-cell">第6次</div>
+                          <div class="plan-cell">效果评估调整</div>
+                          <div class="plan-cell">1个月后</div>
+                          <div class="plan-cell">家庭和谐度提升</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/consultation-record.js"></script>
+</body>
+</html> 

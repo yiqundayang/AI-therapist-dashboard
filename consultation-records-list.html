@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>咨询记录列表 - AI咨询师驾驶舱</title>
+  
+  <!-- 引入公共样式 -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/consultation-records-list.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 页面头部 -->
+    <header class="page-header">
+      <a href="javascript:history.back()" class="back-btn">← 返回</a>
+      <h1 class="page-title">咨询记录列表</h1>
+      <div class="header-actions">
+        
+      </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+      <!-- 搜索和筛选区域 -->
+      <div class="search-filter-section">
+        <div class="search-filter-container">
+          <div class="search-box">
+            <input type="text" id="recordSearch" class="search-input" placeholder="搜索客户姓名或手机号...">
+            <span class="search-icon">🔍</span>
+          </div>
+          
+          <div class="filter-controls">
+            <select id="consultationTypeFilter" class="filter-select">
+              <option value="all">全部咨询类型</option>
+              <option value="youth">青少年咨询</option>
+              <option value="ecommerce">电商咨询</option>
+              <option value="sleep">睡眠障碍</option>
+            </select>
+            
+            <select id="consultationMethodFilter" class="filter-select">
+              <option value="all">全部咨询方式</option>
+              <option value="offline">到店</option>
+              <option value="video">视频</option>
+            </select>
+            
+            <select id="sortBy" class="filter-select">
+              <option value="recent">最近咨询</option>
+              <option value="appointment">预约时间</option>
+              <option value="hours">消耗小时数</option>
+            </select>
+            
+            <button class="btn btn-secondary filter-btn" id="filterBtn">筛选</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 咨询记录列表 -->
+      <div class="records-list-section">
+        <div class="list-header">
+          <h2>咨询记录列表</h2>
+        </div>
+
+        <!-- 表格视图 -->
+        <div class="records-table-container" id="recordsTable">
+          <table class="records-table">
+            <thead>
+              <tr>
+                <th>客户信息</th>
+                <th>咨询类型</th>
+                <th>咨询方式</th>
+                <th>预约时间</th>
+                <th>核销订单</th>
+                <th>消耗小时数</th>
+                <th>状态</th>
+                <th class="actions-column">操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+              <!-- 表格行将动态生成 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            <span id="pageInfo">显示第 1-10 条，共 10 条记录</span>
+          </div>
+          <div class="pagination-controls">
+            <button class="btn btn-outline pagination-btn" id="prevBtn" disabled>
+              ← 上一页
+            </button>
+            <div class="page-numbers" id="pageNumbers">
+              <!-- 页码将动态生成 -->
+            </div>
+            <button class="btn btn-outline pagination-btn" id="nextBtn" disabled>
+              下一页 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 状态变更弹窗 -->
+  <div class="modal" id="statusChangeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">状态变更</h3>
+        <button class="modal-close" id="statusModalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="status-change-description" id="statusChangeDescription">
+          您正在更改刘露怡预约的刘露怡咨询师 2025-05-25 11:00-11:20的睡眠障碍的咨询状态。
+        </p>
+        <div class="status-options">
+          <span class="status-label">*咨询完成情况：</span>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="consultationStatus" value="completed">
+              <span class="radio-text">已完成咨询</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="consultationStatus" value="cancelled">
+              <span class="radio-text">已取消咨询</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="statusCancelBtn">取消</button>
+        <button class="btn btn-primary" id="statusConfirmBtn">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入公共脚本 -->
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/consultation-records-list.js"></script>
+</body>
+</html> 

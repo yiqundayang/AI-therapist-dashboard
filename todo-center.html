@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>待办中心 - AI咨询师驾驶舱</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/todo.css">
+</head>
+<body>
+  <div class="page-container">
+    <!-- 页面头部 -->
+    <header class="page-header">
+      <h1 class="page-title">待办中心</h1>
+    </header>
+    
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+      <!-- 日期选择器 -->
+      <div class="date-selector" id="dateSelector">
+        <button class="date-tab active" data-date="today">今天</button>
+        <button class="date-tab" data-date="tomorrow">明天</button>
+        <!-- 动态生成的日期标签会在这里插入 -->
+      </div>
+      
+      <!-- 咨询区域 -->
+      <section class="consultation-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            咨询
+          </h2>
+          <button class="btn-link" id="viewAllBtn">查看全部客户 ></button>
+        </div>
+        
+        <div class="consultation-list" id="consultationList">
+          <!-- 动态渲染的咨询项会在这里 -->
+        </div>
+      </section>
+      
+      <!-- 咨询记录区域 -->
+      <section class="consultation-records-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            咨询记录
+          </h2>
+          <button class="btn-link" id="viewAllRecordsBtn">查看全部咨询记录 ></button>
+        </div>
+        
+        <div class="records-list" id="recordsList">
+          <!-- 动态渲染的记录项会在这里 -->
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- 确认核销弹窗 -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content checkout-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">视频咨询核销</h3>
+        <button class="close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      
+      <div class="checkout-info">
+        <div class="info-row">
+          <span class="info-label">来访者:</span>
+          <span class="info-value" id="visitorName">王小芳</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">开始时间:</span>
+          <span class="info-value" id="startTime">2025年6月17日 18:30</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">实际时长:</span>
+          <span class="info-value" id="actualDuration">48分13秒:54:18</span>
+        </div>
+      </div>
+      
+      <div class="duration-section">
+        <label class="section-label">核销时长:</label>
+        <div class="duration-options">
+          <button class="duration-btn" data-duration="30">30分钟</button>
+          <button class="duration-btn" data-duration="45">45分钟</button>
+          <button class="duration-btn active" data-duration="60">60分钟</button>
+          <button class="duration-btn" data-duration="90">90分钟</button>
+        </div>
+      </div>
+      
+      <div class="remark-section">
+        <label class="section-label">备注（可选）:</label>
+        <textarea class="remark-input" id="checkoutRemark" placeholder="请输入核销备注信息..."></textarea>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelBtn">取消</button>
+        <button class="btn btn-primary" id="confirmBtn">确认核销</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 分享房间弹窗 -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <h3 class="modal-title">分享咨询房间</h3>
+      <p class="modal-message">请选择分享方式：</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="shareCancel">取消</button>
+        <button class="btn btn-primary" id="shareConfirm">分享链接</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 录音弹窗 -->
+  <div class="modal" id="recordingModal">
+    <div class="modal-content">
+      <h3 class="modal-title">声纹采集</h3>
+      <p class="modal-message">请在安静的环境下，匀速朗读以下文字，录音时长需大于15秒。</p>
+      <div class="recording-prompt" id="recordingPrompt">
+        <!-- 随机文本会在这里显示 -->
+      </div>
+      <div class="recording-timer" id="recordingTimer">00:00</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelRecordingBtn">取消</button>
+        <button class="btn btn-primary" id="toggleRecordingBtn">开始录音</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast提示 -->
+  <div class="toast" id="toast" style="display: none;">
+    <span class="toast-message" id="toastMessage"></span>
+  </div>
+  
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/todo.js"></script>
+</body>
+</html> 

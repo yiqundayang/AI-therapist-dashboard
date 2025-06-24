@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>咨询笔记 - AI咨询师驾驶舱</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/consultation-notes.css">
+</head>
+<body>
+  <div class="page-container">
+    <!-- 页面头部 -->
+    <header class="page-header">
+      <h1 class="page-title">咨询笔记</h1>
+      <div class="header-actions">
+        <button class="btn btn-danger" id="endConsultationBtn">结束咨询</button>
+        <button class="btn btn-link back-btn" onclick="history.back()">← 返回</button>
+      </div>
+    </header>
+    
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+      <div class="notes-layout">
+        <!-- 上部分：笔记画板 -->
+        <section class="notes-section">
+          <!-- 咨询基础信息 -->
+          <div class="consultation-info">
+            <div class="info-item">
+              <label class="info-label">咨询时间</label>
+              <span class="info-value" id="consultationTime">2024年1月18日 14:00-15:00</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">来访者</label>
+              <span class="info-value" id="clientName">李小雅</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">咨询次数</label>
+              <span class="info-value" id="sessionCount">第 3 次咨询</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">咨询时长</label>
+              <span class="info-value timer" id="sessionTimer">00:00:00</span>
+            </div>
+          </div>
+          
+          <!-- 画板编辑区域 -->
+          <div class="canvas-editor">
+            <div class="canvas-toolbar">
+              <div class="toolbar-group">
+                <button class="canvas-tool active" data-tool="pen" title="画笔">
+                  ✏️
+                </button>
+                <button class="canvas-tool" data-tool="eraser" title="橡皮擦">
+                  🧹
+                </button>
+                <button class="canvas-tool" data-tool="text" title="文字">
+                  📝
+                </button>
+              </div>
+              <div class="toolbar-group">
+                <label class="color-label">颜色:</label>
+                <input type="color" id="colorPicker" value="#000000" class="color-picker">
+                <label class="size-label">粗细:</label>
+                <input type="range" id="brushSize" min="1" max="20" value="3" class="brush-size">
+              </div>
+              <div class="toolbar-group">
+                <button class="canvas-action" id="clearCanvas" title="清空画板">
+                  🗑️ 清空
+                </button>
+                <button class="canvas-action" id="undoCanvas" title="撤销">
+                  ↶ 撤销
+                </button>
+              </div>
+            </div>
+            
+            <div class="canvas-container">
+              <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+              <div id="textOverlay" class="text-overlay"></div>
+            </div>
+          </div>
+          
+          <!-- 快速笔记覆盖层 - 移到画板容器外面，避免被overflow:hidden裁剪 -->
+          <div class="quick-notes-overlay" id="quickNotesOverlay">
+            <!-- 快速笔记将在这里显示 -->
+          </div>
+        </section>
+        
+        <!-- 下部分：实时逐字稿 -->
+        <section class="transcript-section" id="transcriptSection">
+          <div class="section-header">
+            <h2 class="section-title">实时逐字稿</h2>
+            <div class="section-controls">
+              <button class="btn btn-sm btn-outline" id="startRecordBtn">开始转文字</button>
+              <button class="btn btn-sm btn-secondary" id="pauseRecordBtn" style="display: none;">暂停转文字</button>
+              <button class="btn btn-sm btn-accent" id="quickNoteBtn" style="display: none;">✍️ 快速笔记</button>
+              <button class="btn btn-sm btn-icon toggle-btn" id="toggleTranscriptBtn" title="收起/展开">
+                <span class="toggle-icon">−</span>
+              </button>
+            </div>
+          </div>
+          <div class="transcript-content" id="transcriptContent">
+            <div class="transcript-text" id="transcriptText">
+              <!-- 实时逐字稿内容将在这里显示 -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    
+    <!-- 核销弹窗 -->
+    <div id="checkoutModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>咨询核销</h3>
+          <button class="modal-close" id="checkoutModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="checkout-info">
+            <div class="info-row">
+              <label>来访者：</label>
+              <span id="checkoutClientName">李小雅</span>
+            </div>
+            <div class="info-row">
+              <label>咨询开始时间：</label>
+              <span id="checkoutStartTime">2024年1月18日 14:00</span>
+            </div>
+            <div class="info-row">
+              <label>实际咨询时长：</label>
+              <span id="checkoutActualDuration">00:45:30</span>
+            </div>
+          </div>
+          
+          <div class="checkout-duration">
+            <label for="checkoutTime">选择核销时长：</label>
+            <div class="duration-options">
+              <button class="duration-btn" data-minutes="30">30分钟</button>
+              <button class="duration-btn" data-minutes="45">45分钟</button>
+              <button class="duration-btn active" data-minutes="60">60分钟</button>
+              <button class="duration-btn" data-minutes="90">90分钟</button>
+            </div>
+            <div class="custom-duration">
+              <label>自定义时长：</label>
+              <input type="number" id="customMinutes" min="1" max="180" placeholder="分钟">
+            </div>
+          </div>
+          
+          <div class="checkout-notes">
+            <label for="checkoutRemark">核销备注：</label>
+            <textarea id="checkoutRemark" placeholder="请输入核销备注（可选）"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="cancelCheckout">取消</button>
+          <button class="btn btn-primary" id="confirmCheckout">确认核销</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/consultation-notes.js"></script>
+</body>
+</html> 

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>视频咨询 - AI咨询师驾驶舱</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/video-consultation.css">
+</head>
+<body>
+  <!-- 页面头部 -->
+  <header class="consultation-header">
+    <div class="header-left">
+      <button class="back-btn" onclick="history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        <span>返回</span>
+      </button>
+      <div class="consultation-info">
+        <h1>📹 视频咨询</h1>
+        <div class="client-details">
+          <span class="client-name" id="clientName">王小秀</span>
+          <span class="separator">•</span>
+          <span class="consultation-time" id="consultationTime">2025/6/17 18:30-19:30</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="consultation-status">
+        <div class="status-indicator"></div>
+        <span>咨询中</span>
+      </div>
+      <div class="timer-display">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+        <span class="session-timer" id="sessionTimer">00:00:11</span>
+      </div>
+      <button class="end-btn" id="endConsultationBtn">结束咨询</button>
+    </div>
+  </header>
+
+  <!-- 主要内容区域 - 支持横向拖拽 -->
+  <main class="consultation-container" id="consultationContainer">
+    <!-- 左侧视频区域 -->
+    <section class="video-section" id="videoSection">
+      <!-- 多人视频网格 -->
+      <div class="video-grid-container" id="videoGridContainer">
+        <!-- 主讲者视频 -->
+        <div class="video-frame main-speaker">
+          <div class="video-content">
+            <div class="video-avatar">
+              <div class="avatar-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="participant-name">刘豊信(咨询师)</span>
+            </div>
+            <div class="video-controls">
+              <button class="control-btn" id="muteBtn" title="静音">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+              </button>
+              <button class="control-btn" id="cameraBtn" title="摄像头">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 7l-7 5 7 5V7z"/>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+              </button>
+            </div>
+            <!-- 说话者指示器 -->
+            <div class="speaker-indicator">
+              <div class="audio-wave"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 参与者视频1 -->
+        <div class="video-frame participant">
+          <div class="video-content">
+            <div class="video-avatar">
+              <div class="avatar-circle participant">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="participant-name">王小秀</span>
+            </div>
+            <!-- 说话者指示器 -->
+            <div class="speaker-indicator active">
+              <div class="audio-wave"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 参与者视频2 -->
+        <div class="video-frame participant">
+          <div class="video-content">
+            <div class="video-avatar">
+              <div class="avatar-circle participant">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <span class="participant-name">家庭成员</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 更多参与者占位符 -->
+        <div class="video-frame placeholder" style="display: none;">
+          <div class="video-content">
+            <div class="add-participant">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              <span>邀请参与者</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 会议控制栏 -->
+      <div class="meeting-controls">
+        <div class="meeting-info">
+          <span class="meeting-duration">会议时长: <span id="meetingDuration">12:34</span></span>
+          <span class="participants-count">参与者: <span id="participantsCount">3</span></span>
+        </div>
+        <div class="control-actions">
+          <button class="meeting-btn" id="inviteBtn" title="邀请参与者">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/>
+              <line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+          </button>
+          <button class="meeting-btn" id="layoutBtn" title="布局设置">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </button>
+          <button class="meeting-btn" id="fullscreenBtn" title="全屏显示">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 拖拽分割条 -->
+    <div class="resize-handle" id="resizeHandle">
+      <div class="resize-line"></div>
+      <div class="resize-grip">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- 右侧信息面板 -->
+    <section class="info-panel" id="infoPanel">
+      <div class="panel-header">
+        <div class="tab-navigation">
+          <button class="tab-btn active" data-tab="transcript">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+            <span>实时逐字稿</span>
+          </button>
+          <button class="tab-btn" data-tab="history">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v5h5"/>
+              <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/>
+              <path d="M12 7v5l4 2"/>
+            </svg>
+            <span>咨询记录</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-content">
+        <!-- 实时逐字稿面板 -->
+        <div class="tab-content active" id="transcriptTab">
+          <!-- 实时提示区域 -->
+          <div class="ai-tips-container">
+            <div class="ai-tips-header" id="aiTipsHeader">
+              <div class="header-left">
+                <h3>🤖 AI实时助手</h3>
+                <span class="tips-count">2条提示</span>
+              </div>
+              <button class="collapse-btn" id="collapseBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6,9 12,15 18,9"/>
+                </svg>
+              </button>
+            </div>
+            <div class="ai-tips-content" id="aiTipsContent">
+              <div class="tip-item urgent">
+                <div class="tip-content">
+                  <div class="tip-text">注意到来访者在谈到家庭关系时的语言变化，可能隐含敏感议题。</div>
+                </div>
+              </div>
+              
+              <div class="tip-item suggestion">
+                <div class="tip-content">
+                  <div class="tip-text">建议使用反映技术："我感觉到你在说这个话题时有些不一样的感受？"</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="transcript-container">
+            <div class="transcript-header">
+              <h3>实时逐字稿</h3>
+              <div class="transcript-controls">
+                <button class="transcript-btn" id="quickMarkBtn" style="display: inline-flex;" title="快速标记">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="14,6 10,14 21,3"/>
+                  </svg>
+                  <span>快速标记</span>
+                </button>
+                <button class="transcript-btn" id="endMarkBtn" style="display: none;" title="结束标记">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  <span>结束标记</span>
+                </button>
+              </div>
+            </div>
+            <div class="transcript-messages" id="transcriptMessages">
+              <div class="transcript-message" data-speaker="counselor" data-time="10:25:28">
+                <div class="message-header">
+                  <span class="speaker-name counselor">咨询师</span>
+                  <span class="message-time">10:25:28</span>
+                </div>
+                <div class="message-content">好的，今天我们继续上次的话题。关于您的工作压力情况。</div>
+              </div>
+              
+              <div class="transcript-message" data-speaker="client" data-time="10:25:45">
+                <div class="message-header">
+                  <span class="speaker-name client">王小秀</span>
+                  <span class="message-time">10:25:45</span>
+                </div>
+                <div class="message-content">最近确实压力很大，老板总是在下班后发消息，搞得我晚上都不敢放松。</div>
+              </div>
+              
+              <div class="transcript-message" data-speaker="counselor" data-time="10:26:10">
+                <div class="message-header">
+                  <span class="speaker-name counselor">咨询师</span>
+                  <span class="message-time">10:26:10</span>
+                </div>
+                <div class="message-content">这种工作边界不清楚确实会造成很大的心理负担。您有考虑过和老板沟通这个问题吗？</div>
+              </div>
+              
+              <div class="transcript-message" data-speaker="client" data-time="10:26:35">
+                <div class="message-header">
+                  <span class="speaker-name client">王小秀</span>
+                  <span class="message-time">10:26:35</span>
+                </div>
+                <div class="message-content">我不敢说，怕被认为不够敬业。但这样下去我感觉自己快要崩溃了。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- 历史记录面板 -->
+        <div class="tab-content" id="historyTab">
+          <div class="history-container">
+            <div class="history-tabs">
+              <button class="history-tab-btn active" data-tab="records">历史记录</button>
+              <button class="history-tab-btn" data-tab="userinfo">用户信息</button>
+            </div>
+            
+            <!-- 历史记录子面板 -->
+            <div class="history-tab-content active" id="recordsContent">
+              <div class="history-list" id="historyList">
+                <div class="history-item">
+                  <div class="history-meta">
+                    <span class="session-number">第 16 次</span>
+                    <span class="session-date">2025-05-25</span>
+                  </div>
+                  <div class="history-title">工作压力与边界问题</div>
+                  <div class="history-time">15:20-15:40</div>
+                  <div class="history-type video">📹 视频咨询</div>
+                </div>
+                <div class="history-item">
+                  <div class="history-meta">
+                    <span class="session-number">第 15 次</span>
+                    <span class="session-date">2025-05-18</span>
+                  </div>
+                  <div class="history-title">职场人际关系困扰</div>
+                  <div class="history-time">15:00-15:20</div>
+                  <div class="history-type offline">🏢 到店咨询</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 用户信息子面板 -->
+            <div class="history-tab-content" id="userinfoContent">
+              <div class="info-section">
+                <h4>主要困扰及诉求</h4>
+                <p>近期因孩子（小明，15岁）学业成绩下滑，沉迷游戏问题，与妻子在教养方式上产生显著分歧，希望找到平衡的教养策略，改善家庭沟通，帮助孩子重拾学习兴趣。</p>
+              </div>
+              
+              <div class="info-section">
+                <div class="section-header">
+                  <h4>🔍 风险评估</h4>
+                  <button class="help-btn" title="风险评估说明">?</button>
+                </div>
+                <div class="risk-tags">
+                  <span class="risk-tag medium">社会适应 - 中</span>
+                  <span class="risk-tag high">重度情绪 - 高</span>
+                  <span class="risk-tag low">自我风险 - 低</span>
+                </div>
+                <p class="risk-description">中度风险。来访者表现出明显的焦虑情绪，存在失眠、食欲不振等生理反应，家庭内突频率较高，可能影响家庭稳定及孩子心理健康，无自伤或伤人意念。</p>
+              </div>
+              
+              <div class="info-section">
+                <div class="section-header">
+                  <h4>📋 疾病史与用药史</h4>
+                  <button class="help-btn" title="疾病史说明">?</button>
+                </div>
+                <div class="medical-timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-date">2015年起:</div>
+                    <div class="timeline-content">存在情绪低落，兴趣减退等问题，医院诊断为抑郁症，服药半年后停药</div>
+                  </div>
+                  <div class="timeline-item current">
+                    <div class="timeline-date">现阶段:</div>
+                    <div class="timeline-content">存在重度抑郁症状，伴有自责倾向，未服药</div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">2019年:</div>
+                    <div class="timeline-content">开始服用草酸艾司西酞普兰片(10mg/日)，后调整至15mg/日</div>
+                  </div>
+                  <div class="timeline-item current">
+                    <div class="timeline-date">现阶段:</div>
+                    <div class="timeline-content">医生建议使用度洛西汀胶囊和水氯平片，但未服药</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 核销弹窗 -->
+  <div class="modal" id="checkoutModal" style="display: none;">
+    <div class="modal-content checkout-modal">
+      <div class="modal-header">
+        <h3>视频咨询核销</h3>
+        <button class="modal-close" id="checkoutModalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="checkout-info">
+          <div class="info-row">
+            <label>来访者：</label>
+            <span id="checkoutClientName">王小秀</span>
+          </div>
+          <div class="info-row">
+            <label>开始时间：</label>
+            <span id="checkoutStartTime">2025年6月17日 18:30</span>
+          </div>
+          <div class="info-row">
+            <label>实际时长：</label>
+            <span id="checkoutActualDuration">00:45:30</span>
+          </div>
+        </div>
+        
+        <div class="checkout-duration">
+          <label>核销时长：</label>
+          <div class="duration-options">
+            <button class="duration-btn" data-minutes="30">30分钟</button>
+            <button class="duration-btn" data-minutes="45">45分钟</button>
+            <button class="duration-btn active" data-minutes="60">60分钟</button>
+            <button class="duration-btn" data-minutes="90">90分钟</button>
+          </div>
+        </div>
+        
+        <div class="checkout-notes">
+          <label for="checkoutRemark">备注（可选）：</label>
+          <textarea id="checkoutRemark" placeholder="请输入核销备注信息..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelCheckout">取消</button>
+        <button class="btn btn-primary" id="confirmCheckout">确认核销</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/video-consultation.js"></script>
+</body>
+</html> 
